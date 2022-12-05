@@ -1,0 +1,27 @@
+#FROM docker.synapse.org/syn26029962/gimilabfinal:latest_ver2
+FROM nvidia/cuda:10.2-base-ubuntu18.04
+
+RUN apt-get update && apt-get install -y curl 
+RUN ln -snf /usr/share/zoneinfo/$(curl https://ipapi.co/timezone) /etc/localtime
+
+#COPY requirements_py.txt ./
+#RUN mkdir /home/Develop
+
+WORKDIR /home/Develop
+COPY . ./
+
+RUN apt-get update && apt-get install -y software-properties-common gcc && \
+    add-apt-repository -y ppa:deadsnakes/ppa
+
+RUN apt-get update && apt-get install -y python3.10 python3-distutils python3-pip python3-apt
+
+# WORKDIR /usr/src/app
+RUN apt-get install vim -y # for debug
+
+RUN pip3 install --upgrade pip
+RUN pip3 install -r requirements.txt
+#RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
+RUN pip3 install torch --extra-index-url https://download.pytorch.org/whl/cu10
+WORKDIR /
+
+CMD ["bash", "./home/Develop/bash.sh"]
