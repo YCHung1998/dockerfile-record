@@ -1,0 +1,16 @@
+FROM docker.synapse.org/syn26029962/gimilabfinal:latest_ver2
+
+RUN apt-get update && apt-get install -y curl 
+
+RUN mkdir -p /home/input/raw_valid
+WORKDIR /home/
+COPY . ./
+
+RUN apt-get update && apt-get install -y python3.10 python3-distutils python3-pip python3-apt
+
+RUN pip3 install --upgrade pip
+RUN pip3 install -r ./GL_python/requirements.txt
+RUN pip3 install torch --extra-index-url https://download.pytorch.org/whl/cu10
+
+CMD ["bash", "./bash.sh"]
+# docker run --gpus 1 -it  <docker image> /bin/bash
