@@ -1,12 +1,8 @@
-# build image based on ubuntu latest
 FROM ubuntu:latest
 
 RUN apt-get update && apt-get install -y curl
-# select ubuntu about the region  
-# RUN ln -snf /usr/share/zoneinfo/$(curl https://ipapi.co/timezone) /etc/localtime
 RUN ln -snf /usr/share/zoneinfo/Asia/Taipei /etc/localtime
 
-# RUN apt-get update && apt-get install -y python3.10 python3-distutils python3-pip python3-apt
 RUN apt-get update && apt-get install -y python3.10 python3-distutils python3-pip python3-apt
 # install vim for debug 
 RUN apt-get install vim -y
