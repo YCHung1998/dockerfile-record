@@ -1,0 +1,46 @@
+# build image based on ubuntu latest
+FROM ubuntu:latest
+
+RUN apt-get update && apt-get install -y curl
+# select ubuntu about the region  
+# RUN ln -snf /usr/share/zoneinfo/$(curl https://ipapi.co/timezone) /etc/localtime
+RUN ln -snf /usr/share/zoneinfo/Asia/Taipei /etc/localtime
+
+# RUN apt-get update && apt-get install -y python3.10 python3-distutils python3-pip python3-apt
+RUN apt-get update && apt-get install -y python3.10 python3-distutils python3-pip python3-apt
+# install vim for debug 
+RUN apt-get install vim -y
+
+# make raw_valid directory 
+RUN mkdir -p /home/input/raw_valid
+
+# set the workspace at home 
+WORKDIR /home/
+# copy current all files and directory except those is record in .dockerignore
+COPY . ./
+
+# python3 / pip3
+RUN pip3 install --upgrade pip
+RUN pip3 install -r ./GL_python/requirements.txt
+RUN pip3 install torch --extra-index-url https://download.pytorch.org/whl/cu10
+
+
+# matlab
+# open the permision 
+RUN chmod -R 777 ./MATLAB_Runtime_R2021a_Update_7_glnxa64/ 
+RUN chmod -R 777 ./GL_matlab/temp/
+# install the matlab runtime
+RUN ./MATLAB_Runtime_R2021a_Update_7_glnxa64/install -mode silent -agreeToLicense yes
+# install the shared object source
+RUN apt-get update && apt-get install libxt6 -y
+RUN chmod 777 libstdc++.so.6.0.30
+RUN mv ./libstdc++.so.6.0.30 /usr/local/MATLAB/MATLAB_Runtime/v910/sys/os/glnxa64/
+RUN rm /usr/local/MATLAB/MATLAB_Runtime/v910/sys/os/glnxa64/libstdc++.so.6
+RUN cd /usr/local/MATLAB/MATLAB_Runtime/v910/sys/os/glnxa64/
+RUN ln -s libstdc++.so.6.0.30 libstdc++.so.6
+RUN cd /home
+
+CMD ["bash", "./bash.sh"]
+
+# docker run --gpus 1 -it  <docker image> /bin/bash
+# docker build -t name -f dockerfile_test
